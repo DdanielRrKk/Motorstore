@@ -1,22 +1,42 @@
 <?php
-    $serverName = "DESKTOP-F6N9F54";
-    $connectionOptions = array("Database" => "motorstore", "Uid" => "daniel", "PWD" => "admin");
+    require_once '../SQLConnection.php';
 
-    $conn = sqlsrv_connect($serverName, $connectionOptions);
+    require_once '../models/Motorcycle.php';
+    require_once '../models/Car.php';
+    require_once '../models/Truck.php';
+    require_once '../models/Trailer.php';
 
-    // $productId = $_GET['id'];
+    $conn = SQLConncetion::get_connection();
 
-    $query = "SELECT * FROM dbo.Products WHERE";
-    $stmt = sqlsrv_query($conn, $query);
-
-    if ($stmt === false) die(print_r(sqlsrv_errors(), true));
-
-    while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-        $array[] = $row;
+    $query = "CALL GetProducts()";
+    $array = SQLConncetion::execute_query($query)->fetch_all(MYSQLI_ASSOC);
+    
+    $data = array();
+    foreach ($array as $item) {
+        switch ($item['ProductType']) {
+            case 1:
+                array_push($data, new Motorcycle($item['Id'], $item['ProductType'], $item['Brand'], $item['Model'], $item['EngineCapacity'], $item['Colour']));
+                break;
+            
+            case 2:
+                array_push($data, new Car($item['Id'], $item['ProductType'], $item['Brand'], $item['Model'], $item['EngineCapacity'], $item['Colour'], $item['NumberOfDoors'], $item['CarCategory']));
+                break;
+                
+            case 3:
+                array_push($data, new Truck( $item['Id'], $item['ProductType'], $item['Brand'], $item['Model'], $item['EngineCapacity'], $item['Colour'], $item['NumberOfBeds']));
+                break;
+                
+            case 4:
+                array_push($data, new Trailer($item['Id'], $item['ProductType'], $item['Brand'], $item['Model'], $item['LoadCapacity'], $item['NumberOfAxles']));
+                break;
+        
+            default: break;
+        }
     }
 
     header('Access-Control-Allow-Origin: *');
     header('Content-Type: application/json');
 
-    echo json_encode($array);
+    echo json_encode($data);;
+    $conn->close();
 ?>

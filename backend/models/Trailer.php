@@ -1,12 +1,12 @@
 <?php
-include_once "product.php";
+require_once "Product.php";
 
 class Trailer extends Product {
     public $loadCapacity;
     public $numberOfAxles;
 
-    public function __construct($Id, $brand, $model, $loadCapacity, $numberOfAxles) {
-        parent::__construct($Id, $brand, $model);
+    public function __construct($id, $productType, $brand, $model, $loadCapacity, $numberOfAxles) {
+        parent::__construct($id, $productType, $brand, $model);
         $this->loadCapacity = $loadCapacity;
         $this->numberOfAxles = $numberOfAxles;
     }
