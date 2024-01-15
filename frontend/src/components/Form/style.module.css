@@ -1,0 +1,39 @@
+.form {
+    padding: 10px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    background-color: royalblue;
+    color: white;
+    border-radius: 10px;
+}
+
+.form h3 {
+    width: 100%;
+    text-align: center;
+}
+
+.form label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.form input[type='submit'] {
+    border: none;
+    align-self: center;
+    background-color: gold;
+    color: black;
+    font-weight: 600;
+    padding: 5px 15px;
+    margin: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form input[type='submit']:hover {
+    background-color: white;
+    color: black;
+}

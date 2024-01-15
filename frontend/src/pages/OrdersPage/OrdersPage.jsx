@@ -1,22 +1,29 @@
 import {useState, useEffect} from 'react';
-import ProductList from '../../components/Lists/ProductList';
-import {GetProducts, GetOrders} from '../../apis/ajax';
+import OrderList from '../../components/Lists/OrderList';
+import {GetOrders} from '../../apis/ajax';
 
 function OrdersPage() {
-	const [products, setProducts] = useState([]);
+	const [orders, setOrders] = useState([]);
 
 	useEffect(() => {
-		GetProducts().then(results => {
-			setProducts(results);
-			console.log(results);
+		GetOrders().then(results => {
+			setOrders(Object.values(results));
 		});
 	}, []);
 
 	return (
-		<div>
-			<h2>Orders</h2>
+		<div
+			style={{
+				width: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'center',
+				alignItems: 'center',
+			}}
+		>
+			<h2>All Orders</h2>
 
-			<ProductList products={products} />
+			<OrderList orders={orders} />
 		</div>
 	);
 }

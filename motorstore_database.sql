@@ -1,4 +1,6 @@
-CREATE TABLE Product (
+USE motorstore;
+
+CREATE TABLE Products (
     Id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     ProductType INT NOT NULL,
     Brand VARCHAR(255) NOT NULL,
@@ -11,21 +13,20 @@ CREATE TABLE Product (
     LoadCapacity INT,
     NumberOfAxles INT
 );
-
 CREATE TABLE Orders (
-    Id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    OrderNumber VARCHAR(20) NOT NULL,
+    OrderNumber VARCHAR(20) PRIMARY KEY NOT NULL,
     ClientName VARCHAR(100) NOT NULL
 );
-
-CREATE TABLE OrderProducts (
-    OrderID INT NOT NULL,
+CREATE TABLE OrdersProducts (
+	OrderNumber VARCHAR(20) NOT NULL,
     ProductID INT NOT NULL,
-    PRIMARY KEY (OrderID, ProductID)
+    Quantity INT NOT NULL,
+    PRIMARY KEY (OrderNumber, ProductID),
+    FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber),
+    FOREIGN KEY (ProductID) REFERENCES Products(Id)
 );
 
--- INSERTS PRODUCT
-INSERT INTO Product (ProductType, Brand, Model, EngineCapacity, Colour, NumberOfDoors, CarCategory, NumberOfBeds, LoadCapacity, NumberOfAxles)
+INSERT INTO Products (ProductType, Brand, Model, EngineCapacity, Colour, NumberOfDoors, CarCategory, NumberOfBeds, LoadCapacity, NumberOfAxles)
 VALUES (1, 'Honda', 'CBR1000RR', 1000, 'Red', NULL, NULL, NULL, NULL, NULL),
 		(1, 'Harley-Davidson', 'Street Glide', 1800, 'Black', NULL, NULL, NULL, NULL, NULL),
 		(2, 'Toyota', 'Camry', 2500, 'Silver', 4, 'Sedan', NULL, NULL, NULL),
@@ -34,41 +35,30 @@ VALUES (1, 'Honda', 'CBR1000RR', 1000, 'Red', NULL, NULL, NULL, NULL, NULL),
 		(3, 'Ford', 'F-150', 5500, 'Black', NULL, NULL, 1, NULL, NULL),
 		(4, 'Utility Trailer Co.', 'CargoPro', NULL, 'Gray', NULL, NULL, NULL, 5000, 2),
 		(4, 'Big Tex Trailers', 'Dump Trailer', NULL, 'Green', NULL, NULL, NULL, 8000, 3);
-
--- INSERTS ORDERS
 INSERT INTO Orders (OrderNumber, ClientName)
 VALUES ('ORD001', 'John Doe'),
        ('ORD002', 'Jane Smith');
+INSERT INTO OrdersProducts (OrderNumber, ProductID, Quantity)
+VALUES ('ORD001', 1, 2), -- John Doe orders Honda CBR1000RR
+       ('ORD001', 3, 2), -- John Doe also orders Toyota Camry
+       ('ORD002', 2, 4), -- Jane Smith orders Harley-Davidson Street Glide
+       ('ORD002', 5, 1); -- Jane Smith also orders Chevrolet Silverado
 
--- INSERTS ORDER PRODUCTS
-INSERT INTO OrderProducts (OrderID, ProductID)
-VALUES (1, 1), -- John Doe orders Honda CBR1000RR
-       (1, 3), -- John Doe also orders Toyota Camry
-       (2, 2), -- Jane Smith orders Harley-Davidson Street Glide
-       (2, 5); -- Jane Smith also orders Chevrolet Silverado
-
-
-use motorstore;
-
-TRUNCATE TABLE Product;
-
-DROP PROCEDURE GetOrders;
 
 DELIMITER //
-create procedure getProducts()
-begin
-	SELECT * FROM Product;
-end//
+CREATE PROCEDURE GetProducts()
+BEGIN
+	SELECT * FROM Products;
+END//
 DELIMITER ;
 
 DELIMITER //
-create procedure getOrders()
-begin
+CREATE PROCEDURE GetOrders()
+BEGIN
 	SELECT 
-		op.OrderID, 
-        op.ProductID, 
         o.OrderNumber, 
         o.ClientName, 
+		p.Id AS 'ProductID',
         p.ProductType, 
         p.Brand, 
         p.Model,
@@ -79,13 +69,31 @@ begin
         p.NumberOfBeds, 
         p.LoadCapacity, 
         p.NumberOfAxles
-    FROM OrderProducts AS op
-    JOIN Orders AS o
-    ON op.OrderID = o.Id
-    JOIN Product AS p
+    FROM Orders AS o
+    JOIN OrdersProducts AS op
+    ON o.OrderNumber = op.OrderNumber
+    JOIN Products AS p
     ON op.ProductID = p.Id;
-end//
+END//
 DELIMITER ;
 
-CALL getProducts();
-CALL getOrders();
+DELIMITER //
+CREATE PROCEDURE AddOrder
+(
+	IN p_OrderNumber VARCHAR(20),
+    IN p_ClientName VARCHAR(100),
+    IN p_OrderedProductId INT,
+    IN p_Quantity INT
+)
+BEGIN
+	DECLARE orderExists INT DEFAULT 0;
+	SET orderExists = (SELECT COUNT(*) FROM Orders WHERE OrderNumber = p_OrderNumber);
+	
+    IF orderExists = 1 THEN
+        INSERT INTO OrdersProducts (OrderNumber, ProductID) VALUES (p_OrderNumber, p_OrderedProductId);
+    ELSE
+        INSERT INTO Orders (OrderNumber, ClientName) VALUES (p_OrderNumber, p_ClientName);
+        INSERT INTO OrdersProducts (OrderNumber, ProductID, Quantity) VALUES (p_OrderNumber, p_OrderedProductId, p_Quantity);
+    END IF;
+END//
+DELIMITER ;

@@ -1,10 +1,47 @@
-.container {
+.container,
+.orderItem {
+    padding: 10px 20px;
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
-    background-color: brown;
-    color: white;
-    font-weight: 600;
     gap: 30px;
+    background-color: royalblue;
+    color: white;
+    border-radius: 5px;
+}
+
+.container>p {
+    font-size: larger;
+    font-weight: 600;
+}
+
+.container>p {
+    width: 30%;
+}
+
+.container>div {
+    width: 70%;
+}
+
+.container>div>p {
+    padding: 2px;
+    margin: 0;
+}
+
+.container>div>p>span {
+    font-weight: 600;
+}
+
+.orderItem {
+    justify-content: space-evenly;
+}
+
+.orderItem>p {
+    font-size: large;
+}
+
+.orderItem>p>span {
+    display: block;
 }

@@ -3,12 +3,27 @@ import style from './style.module.css';
 function CarItem({product}) {
 	return (
 		<div className={style.container}>
-			<p>{product.brand}</p>
-			<p>{product.model}</p>
-			<p>{product.engineCapacity}</p>
-			<p>{product.color}</p>
-			<p>{product.numberOfDoors}</p>
-			<p>{product.carCategory}</p>
+			<p>Car</p>
+			<div>
+				<p>
+					<span>Brand:</span> {product.brand}
+				</p>
+				<p>
+					<span>Model:</span> {product.model}
+				</p>
+				<p>
+					<span>Engine Capacity:</span> {product.engineCapacity}
+				</p>
+				<p>
+					<span>Colour:</span> {product.colour}
+				</p>
+				<p>
+					<span>Number of Doors:</span> {product.numberOfDoors}
+				</p>
+				<p>
+					<span>Car Category:</span> {product.carCategory}
+				</p>
+			</div>
 		</div>
 	);
 }
